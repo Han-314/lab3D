@@ -49,10 +49,11 @@
         var createScene = function() {
             var scene = new BABYLON.Scene(engine);
             // Define a general environment texture
-            hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("https://github.com/Han-314/lab3D/blob/main/textures/environment.dds", scene);
-            scene.environmentTexture = hdrTexture;
+            //hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("https://github.com/Han-314/lab3D/blob/main/textures/environment.dds", scene);
+            //scene.environmentTexture = hdrTexture;
 
-            scene.createDefaultSkybox(hdrTexture, true, 200, 0.7);
+            //scene.createDefaultSkybox(hdrTexture, true, 200, 0.7);
+            scene.clearColor = new BABYLON.Color3(0.92, 0.90, 0.90);
           
             var camera = new BABYLON.ArcRotateCamera("camera1",  -Math.PI / 2, Math.PI / 4, 5, new BABYLON.Vector3(0, 0, 0), scene);
             camera.attachControl(canvas, true);
