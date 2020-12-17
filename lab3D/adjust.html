@@ -49,7 +49,7 @@
         var createScene = function() {
             var scene = new BABYLON.Scene(engine);
             // Define a general environment texture
-            hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("textures/environment.dds", scene);
+            hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("https://github.com/Han-314/lab3D/tree/main/lab3D/textures/environment.dds", scene);
             scene.environmentTexture = hdrTexture;
 
             scene.createDefaultSkybox(hdrTexture, true, 200, 0.7);
