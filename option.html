@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <title>Babylon.js sample code</title>
+
+        <!-- Babylon.js -->
+        <script src="https://code.jquery.com/pep/0.4.2/pep.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
+        <script src="https://preview.babylonjs.com/ammo.js"></script>
+        <script src="https://preview.babylonjs.com/cannon.js"></script>
+        <script src="https://preview.babylonjs.com/Oimo.js"></script>
+        <script src="https://preview.babylonjs.com/earcut.min.js"></script>
+        <script src="https://preview.babylonjs.com/babylon.js"></script>
+        <script src="https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+        <script src="https://preview.babylonjs.com/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script>
+        <script src="https://preview.babylonjs.com/postProcessesLibrary/babylonjs.postProcess.min.js"></script>
+        <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+        <script src="https://preview.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
+        <script src="https://preview.babylonjs.com/gui/babylon.gui.min.js"></script>
+        <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
+
+        <style>
+            html, body {
+                overflow: hidden;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            #renderCanvas {
+                width: 100%;
+                height: 100%;
+                touch-action: none;
+            }
+        </style>
+    </head>
+<body>
+    <canvas id="renderCanvas"></canvas>
+    <script>
+        var canvas = document.getElementById("renderCanvas");
+
+        var engine = null;
+        var scene = null;
+        var sceneToRender = null;
+        var createDefaultEngine = function() { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false}); };
+        var createScene = function () {
+            var scene = new BABYLON.Scene(engine);
+            scene.clearColor = new BABYLON.Color3( .5, .5, .5);
+
+            var camera = new BABYLON.ArcRotateCamera("camera1",  -Math.PI / 2, Math.PI / 4, 5, new BABYLON.Vector3(0, 0, 0), scene);
+            camera.wheelDeltaPercentage = 0.01;
+            camera.attachControl(canvas, true);
+            camera.lowerRadiusLimit = 10;
+            camera.upperRadiusLimit = 30;
+                      
+            var anchor = new BABYLON.TransformNode("");
+
+            // Create the 3D UI manager
+            var manager = new BABYLON.GUI.GUI3DManager(scene);
+        
+            // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
+            var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
+        
+            // Default intensity is 1. Let's dim the light a small amount
+            light.intensity = 0.8;
+            
+        
+            // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
+            var plane = BABYLON.Mesh.CreatePlane("plane1", 8, scene);
+        
+            // Move the sphere upward 1/2 its height
+            plane.position.y = 1;
+        
+            // Our built-in 'ground' shape. Params: name, width, depth, subdivs, scene
+            //var ground = BABYLON.Mesh.CreateGround("ground1", 6, 6, 2, scene);
+        
+            // GUI
+            var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateForMesh(plane, 512, 512);
+        
+            var panel = new BABYLON.GUI.StackPanel();
+            advancedTexture.addControl(panel);
+        
+            var textblock = new BABYLON.GUI.TextBlock();
+            textblock.height = "50px";
+            panel.addControl(textblock);   
+        
+            var addRadio = function(text, parent) {
+        
+                var button = new BABYLON.GUI.RadioButton();
+                button.width = "20px";
+                button.height = "20px";
+                button.color = "white";
+                button.background = "green";     
+        
+                button.onIsCheckedChangedObservable.add(function(state) {
+                    if (state) {
+                        textblock.text = "You selected " + text;
+                    }
+                }); 
+        
+                var header = BABYLON.GUI.Control.AddHeader(button, text, "100px", { isHorizontal: true, controlFirst: true });
+                header.height = "30px";
+        
+                parent.addControl(header);    
+            }
+        
+        
+            addRadio("option 1", panel);
+            addRadio("option 2", panel);
+            addRadio("option 3", panel);
+            addRadio("option 4", panel);
+            addRadio("option 5", panel);
+        
+            // scene.registerBeforeRender(function() {
+            //     ground.rotation.y += 0.01;
+            // })
+        
+            return scene;
+        
+        };
+                var engine;
+                var scene;
+                initFunction = async function() {               
+                    var asyncEngineCreation = async function() {
+                        try {
+                        return createDefaultEngine();
+                        } catch(e) {
+                        console.log("the available createEngine function failed. Creating the default engine instead");
+                        return createDefaultEngine();
+                        }
+                    }
+
+                    engine = await asyncEngineCreation();
+        if (!engine) throw 'engine should not be null.';
+        scene = createScene();};
+        initFunction().then(() => {sceneToRender = scene        
+            engine.runRenderLoop(function () {
+                if (sceneToRender && sceneToRender.activeCamera) {
+                    sceneToRender.render();
+                }
+            });
+        });
+
+        // Resize
+        window.addEventListener("resize", function () {
+            engine.resize();
+        });
+    </script>
+</body>
+</html>
