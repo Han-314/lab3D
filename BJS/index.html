@@ -1,0 +1,214 @@
+<!doctype html>
+<html>
+<head>
+    <title>.babylon animations</title>
+    <meta charset="UTF-8">
+    <!-- this link to the preview online version of BJS -->
+    <script src="https://preview.babylonjs.com/babylon.js"></script>
+    <!-- this is needed for BJS to load scene files -->
+    <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+    <!-- Babylon.js -->
+    <script src="https://code.jquery.com/pep/0.4.2/pep.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
+    <script src="https://preview.babylonjs.com/ammo.js"></script>
+    <script src="https://preview.babylonjs.com/cannon.js"></script>
+    <script src="https://preview.babylonjs.com/Oimo.js"></script>
+    <script src="https://preview.babylonjs.com/earcut.min.js"></script>
+    <script src="https://preview.babylonjs.com/babylon.js"></script>
+    <script src="https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+    <script src="https://preview.babylonjs.com/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script>
+    <script src="https://preview.babylonjs.com/postProcessesLibrary/babylonjs.postProcess.min.js"></script>
+    <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+    <script src="https://preview.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
+    <script src="https://preview.babylonjs.com/gui/babylon.gui.min.js"></script>
+    <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
+
+    <style>
+        html, body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            /* font-family: OpenSans, tahoma, arial, sans-serif;
+            color:white; */
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+    <script type="text/javascript">
+        var canvas = document.getElementById("canvas");
+        var engine = new BABYLON.Engine(canvas, true);
+
+        // first, we create our scene with the static objects http://doc.babylonjs.com/api/classes/babylon.sceneloader#load
+        BABYLON.SceneLoader.Load("", "01.master-static-scene.babylon", engine, function (scene) {
+
+            //here we create a default camera, but you can also of course create a camera into Blender and use it
+            var camera = new BABYLON.ArcRotateCamera("Camera", -1, 1, 25, new BABYLON.Vector3.Zero(), scene);
+            camera.attachControl(canvas, true);
+            
+            
+            //some little basics tweaks on the scene
+            // scene.ambientColor = new BABYLON.Color3(0.1, 0.11, 0.12);
+            // scene.clearColor = new BABYLON.Color3.White();
+            scene.clearColor = new BABYLON.Color3(0.92, 0.90, 0.90);
+            
+            //adding a dynamic light
+            var dirLight = new BABYLON.DirectionalLight("dirLight", new BABYLON.Vector3(1, -1, 1), scene);
+            dirLight.diffuse = new BABYLON.Color3(1, 1, 0.98);
+            dirLight.position = new BABYLON.Vector3(-100, 100, -100);
+            
+            //we can now access to our static objects
+            var ground = scene.getMeshByName("ground.000");
+            ground.receiveShadows = true;
+            
+            var monkey = scene.getMeshByName("Suzanne");
+
+            //adding dynamic shadows
+            var shadowGenerator = new BABYLON.ShadowGenerator(64, dirLight);
+            shadowGenerator.useExponentialShadowMap = true;
+            shadowGenerator.setDarkness(0.5);
+            shadowGenerator.addShadowCaster(monkey);
+            
+            //now, we want our animated object to be in this scene  http://doc.babylonjs.com/api/classes/babylon.sceneloader#importmesh
+            // BABYLON.SceneLoader.ImportMesh("", "", "02.classic-animation.babylon", scene, function (importedMeshes){
+            //     //we can now select our new mesh
+            //     var logo = scene.getMeshByName("logo");
+            //     //and add it to the shadowCaster
+            //     shadowGenerator.addShadowCaster(logo);
+            // });
+            
+            //Interaction
+            // var reaction = function(mesh, color, light) {
+            //     var colorAction = new BABYLON.InterpolateValueActionBABYLON(BABYLON.ActionManager.OnPickTrigger, light, "diffuse", color, 1000, null, true);
+                
+            //     mesh.actionManager = new BABYLON.ActionManager(scene);
+            //     mesh.actionManager.registerAction(
+            //         new BABYLON.InterpolateValueAction(BABYLON.ActionManager.OnPickTrigger, light, "diffuse", BABYLON.Color3.Black(), 1000))
+            //         .then(new BABYLON.CombineAction(BABYLON.ActionManager.NothingTrigger, [ // Then is used to add a child action used alternatively with the root action. 
+            //             colorAction,                                                 // First click: root action. Second click: child action. Third click: going back to root action and so on...   
+            //             new BABYLON.SetValueAction(BABYLON.ActionManager.NothingTrigger, mesh.material, "wireframe", false)
+            //         ]));
+            //     mesh.actionManager.registerAction(new BABYLON.SetValueAction(BABYLON.ActionManager.OnPickTrigger, mesh.material, "wireframe", true))
+            //         .then(new BABYLON.DoNothingAction());
+            //     mesh.actionManager.registerAction(new BABYLON.SetStateAction(BABYLON.ActionManager.OnPickTrigger, light, "off"))
+            //         .then(new BABYLON.SetStateAction(BABYLON.ActionManager.OnPickTrigger, light, "on"));
+            // }
+
+
+            //lab experimental models
+            BABYLON.SceneLoader.ImportMeshAsync("", "/BJS/", "lab8.babylon").then((result) => {
+                // result.mesh[1].position.x= 2;
+                // const table = scene.getMeshByName("table");
+                // const table = result.meshes[0];
+                // table.position.y = 2;
+
+                // result.meshes[0].position.y=2;//table
+                // result.meshes[1].position.y=3;//dish
+                // result.meshes[2].position.y=0.6;//tubeBox
+
+                const table = result.meshes[0];
+                table.position.y = 2;
+
+                const dish = result.meshes[1];
+                dish.position.y = 3;
+
+                const tubeBox = result.meshes[2];
+                tubeBox.position.y = 0.6;
+
+                // GUI
+                var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+
+                var rect1 = new BABYLON.GUI.Rectangle();
+                rect1.width = 0.05;
+                rect1.height = "40px";
+                rect1.cornerRadius = 20;
+                rect1.color = "pink";
+                rect1.thickness = 2;
+                rect1.background = "white";
+                advancedTexture.addControl(rect1);
+                rect1.linkWithMesh(dish);   
+                rect1.linkOffsetY = -150;
+                        
+                        
+                var label = new BABYLON.GUI.TextBlock();
+                label.text = "Dish";
+                rect1.addControl(label);
+                        
+                var target = new BABYLON.GUI.Ellipse();
+                target.width = "10px";
+                target.height = "10px";
+                target.color = "pink";
+                target.thickness = 2;
+                target.background = "white";
+                advancedTexture.addControl(target);
+                target.linkWithMesh(dish);   
+                        
+                var line = new BABYLON.GUI.Line();
+                line.lineWidth = 4;
+                line.color = "pink";
+                line.y2 = 20;
+                line.linkOffsetY = -5;
+                advancedTexture.addControl(line);
+                line.linkWithMesh(dish); 
+                line.connectedControl = rect1; 
+
+                //GUI
+                var rect2 = new BABYLON.GUI.Rectangle();
+                rect2.width = 0.05;
+                rect2.height = "40px";
+                rect2.cornerRadius = 20;
+                rect2.color = "pink";
+                rect2.thickness = 2;
+                rect2.background = "white";
+                advancedTexture.addControl(rect2);
+                rect2.linkWithMesh(tubeBox);   
+                rect2.linkOffsetY = -150;
+                        
+                        
+                var label2 = new BABYLON.GUI.TextBlock();
+                label2.text = "Tubes";
+                rect2.addControl(label2);
+                        
+                var target2 = new BABYLON.GUI.Ellipse();
+                target2.width = "10px";
+                target2.height = "10px";
+                target2.color = "pink";
+                target2.thickness = 2;
+                target2.background = "white";
+                advancedTexture.addControl(target2);
+                target2.linkWithMesh(tubeBox);   
+                        
+                var line2 = new BABYLON.GUI.Line();
+                line2.lineWidth = 4;
+                line2.color = "pink";
+                line2.y2 = 20;
+                line2.linkOffsetY = -5;
+                advancedTexture.addControl(line2);
+                line2.linkWithMesh(tubeBox); 
+                line2.connectedControl = rect2; 
+
+        });
+            
+            // this show the inspector, uncomment to use it
+            //scene.debugLayer.show();
+
+            engine.runRenderLoop(function() {
+                scene.render();
+            });
+
+            window.addEventListener("resize", function () {
+                engine.resize();
+            });
+        });
+    </script>
+</body>
+</html>
