@@ -49,7 +49,7 @@
         var engine = new BABYLON.Engine(canvas, true);
 
         // first, we create our scene with the static objects http://doc.babylonjs.com/api/classes/babylon.sceneloader#load
-        BABYLON.SceneLoader.Load("", "https://github.com/Han-314/lab3D/blob/main/BJS/01.master-static-scene.babylon", engine, function (scene) {
+        BABYLON.SceneLoader.Load("https://github.com/Han-314/lab3D/blob/main/BJS/", "01.master-static-scene.babylon", engine, function (scene) {
 
             //here we create a default camera, but you can also of course create a camera into Blender and use it
             var camera = new BABYLON.ArcRotateCamera("Camera", -1, 1, 25, new BABYLON.Vector3.Zero(), scene);
