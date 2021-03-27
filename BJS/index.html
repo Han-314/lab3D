@@ -50,9 +50,6 @@
 
         //Basic scene
         BABYLON.SceneLoader.Load("", "01.master-static-scene.glb", engine, function (scene) {
-
-            //var image = BABYLON.SceneLoader.ImportMeshAsync("", "", "hologram.babylon");
-
             //default camera
             var camera = new BABYLON.ArcRotateCamera("Camera", -1, 1, 25, new BABYLON.Vector3.Zero(), scene);
             camera.attachControl(canvas, true);
@@ -67,7 +64,7 @@
             dirLight.diffuse = new BABYLON.Color3(1, 1, 0.98);
             dirLight.position = new BABYLON.Vector3(-100, 100, -100);
             
-            //Brighter
+            //Brighter background
             var helper = scene.createDefaultEnvironment({
                 enableGroundMirror: true,
                 groundShadowLevel: 0.6,
@@ -80,46 +77,38 @@
             ground.receiveShadows = true;
             //ground.position.y = -1;
             
-            //var monkey = scene.getMeshByName("Suzanne");
+            var holo = scene.getMeshByName("hologram");
 
             //adding dynamic shadows
             var shadowGenerator = new BABYLON.ShadowGenerator(64, dirLight);
             shadowGenerator.useExponentialShadowMap = true;
             shadowGenerator.setDarkness(0.5);
-            //shadowGenerator.addShadowCaster(monkey);
+            shadowGenerator.addShadowCaster(holo);
          
-            /***lab experimental modules***/
-            BABYLON.SceneLoader.ImportMeshAsync("", "", "lab14.babylon").then((result) => {
-                // result.mesh[1].position.x= 2;
-                // const table = scene.getMeshByName("table");
-                // const table = result.meshes[0];
-                // table.position.y = 2;
-
-                // result.meshes[0].position.y=2;//table
-                // result.meshes[1].position.y=3;//dish
-                // result.meshes[2].position.y=0.6;//tubeBox
-
-                const table = result.meshes[0];
+/////////////***lab experimental modules***/////////////////////////////////////////////////////////////////////////
+                BABYLON.SceneLoader.ImportMeshAsync("", "", "lab14.babylon").then((result) => {
+                var table = result.meshes[0];
                 table.name = "table";
                 //table.position.y = 2;
 
-                const dish = result.meshes[1];
+                var dish = result.meshes[1];
                 dish.name = "dish";
                 //dish.position.y = 3;
 
-                const tubeBox = result.meshes[2];
+                var tubeBox = result.meshes[2];
                 tubeBox.name = "tubeBox";
                 //tubeBox.position.y = 0.6;
 
-                const loop = result.meshes[3];
+                var loop = result.meshes[3];
                 loop.name = "loop";
+                loop.material = new BABYLON.StandardMaterial("materialMess", scene);
 
-                const microscope = result.meshes[4];
+                var microscope = result.meshes[4];
                 microscope.name = "microscope";
                 //microscope.rotation.x = ;
 
 
-                /***Interactions-Dragging***/
+////////////////***Interactions-Dragging***/////////////////////////////////////////////////////////////////////
                 var startingPoint;
                 var currentObj;
 
@@ -181,7 +170,7 @@
                     }
                 });
 
-                /***Interactions-Displays***/
+//////////////////***Interactions-Displays***//////////////////////////////////////////////////////////////
                 var adt = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("interface", true)
 
                 var mainbox = new BABYLON.GUI.Rectangle();
@@ -248,13 +237,11 @@
                     //headertext.text = mainbox.linkedMesh.name + " property"
                     headertext.text = "Property"
                     for(var i =0; i < scene.meshes.length; i++){
-                        if(mainbox.linkedMesh.name = "tubeBox") {
+                        if(mainbox.getChildByName("tubeBox")){
                             mainbox.addControl(tubeText);
-                        } else if (mainbox.linkedMesh.name = "dish") {
+                        } else if (mainbox.getChildByName("dish")){
                             mainbox.addControl(dishText);
-                        } else if (mainbox.linkedMesh.name = "microscope") {
-                            mainbox.addControl(dishText);
-                        } else if (mainbox.linkedMesh.name = "loop") {
+                        } else if(mainbox.getChildByName("microscope")){
                             mainbox.addControl(dishText);
                         }
                     }
@@ -289,91 +276,85 @@
                 prepareOverOut(microscope);
                 prepareOverOut(loop);
                 
-
-                //Hide lables, if it's table, lables show up
-                mainStage.actionManager = new BABYLON.ActionManager(scene); 
-
-                mainStage.actionManager.registerAction(
-                    new BABYLON.ExecuteCodeAction(
-                        BABYLON.ActionManager.OnPickDownTrigger, function() {
-                            mainbox.isVisible = false;
-                            mainbox.linkWithMesh(null);
-                        }
-                    )
-                );
-                
-                
-                /***GUI1***/
-                var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
-
-                var rect1 = new BABYLON.GUI.Rectangle();
-                rect1.width = 0.05;
-                rect1.height = "40px";
-                rect1.cornerRadius = 20;
-                rect1.color = "pink";
-                rect1.thickness = 2;
-                rect1.background = "white";
-                advancedTexture.addControl(rect1);
-                rect1.linkWithMesh(dish);   
-                rect1.linkOffsetY = -150;
-                               
-                var label = new BABYLON.GUI.TextBlock();
-                label.text = "Dish";
-                rect1.addControl(label);
-                        
-                var target = new BABYLON.GUI.Ellipse();
-                target.width = "10px";
-                target.height = "10px";
-                target.color = "pink";
-                target.thickness = 2;
-                target.background = "white";
-                advancedTexture.addControl(target);
-                target.linkWithMesh(dish);   
-                        
-                var line = new BABYLON.GUI.Line();
-                line.lineWidth = 4;
-                line.color = "pink";
-                line.y2 = 20;
-                line.linkOffsetY = -5;
-                advancedTexture.addControl(line);
-                line.linkWithMesh(dish); 
-                line.connectedControl = rect1; 
-
-                /***GUI2***/
-                var rect2 = new BABYLON.GUI.Rectangle();
-                rect2.width = 0.05;
-                rect2.height = "40px";
-                rect2.cornerRadius = 20;
-                rect2.color = "pink";
-                rect2.thickness = 2;
-                rect2.background = "white";
-                advancedTexture.addControl(rect2);
-                rect2.linkWithMesh(tubeBox);   
-                rect2.linkOffsetY = -150;
-                        
-                var label2 = new BABYLON.GUI.TextBlock();
-                label2.text = "Tubes";
-                rect2.addControl(label2);
-                        
-                var target2 = new BABYLON.GUI.Ellipse();
-                target2.width = "10px";
-                target2.height = "10px";
-                target2.color = "pink";
-                target2.thickness = 2;
-                target2.background = "white";
-                advancedTexture.addControl(target2);
-                target2.linkWithMesh(tubeBox);   
-                        
-                var line2 = new BABYLON.GUI.Line();
-                line2.lineWidth = 4;
-                line2.color = "pink";
-                line2.y2 = 20;
-                line2.linkOffsetY = -5;
-                advancedTexture.addControl(line2);
-                line2.linkWithMesh(tubeBox); 
-                line2.connectedControl = rect2; 
+/////////////***Highlight the mesh: the loop will be highlighted when it touch the dish***////////////////////////
+                var highlight = new BABYLON.HighlightLayer("highlight", scene);
+                //Animation
+                scene.registerBeforeRender(function(){
+                    //change type of imported moudles into BABYLON.Mesh
+                    if(loop.intersectsMesh(dish, false)){
+                        //loop.material.emissiveColor = new BABYLON.Color3(1,0,1);
+                        highlight.addMesh(loop, BABYLON.Color3.White());
+                    } else {
+                        //loop.material = new BABYLON.StandardMaterial("materialMesh", scene);
+                        highlight.removeMesh(loop, BABYLON.Color3.White());
+                    }
+                });
 
         });
+////////////////***Text-Input***////////////////////////////////////////////////////////////////////////////////
+                var plane1 = BABYLON.MeshBuilder.CreatePlane("plane", {width:20, height:20}, scene);
+                plane1.position.y = 10;
+                plane1.position.x = 5;
+                plane1.position.z = 7.9;
+                var advancedTexture1 = BABYLON.GUI.AdvancedDynamicTexture.CreateForMesh(plane1);
+                var panel1 = new BABYLON.GUI.StackPanel();    
+                panel1.background = "transparent";
+                advancedTexture1.addControl(panel1);
+
+                var sv = new BABYLON.GUI.ScrollViewer();
+                sv.thickness = 1;
+                sv.color = "transparent";
+                sv.width = 0.4;
+                sv.height = 0.4;
+                sv.background = "transparent";
+                advancedTexture1.addControl(sv);
+            
+                var tb = new BABYLON.GUI.TextBlock();
+                tb.textWrapping = BABYLON.GUI.TextWrapping.WordWrap;
+                tb.resizeToFit = true;
+                tb.paddingTop = "25%";
+                tb.paddingLeft = "20px";
+                tb.paddingRight = "20px"
+                tb.paddingBottom = "5%";
+                tb.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+                tb.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+                tb.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+                tb.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+                tb.color = "black";
+                tb.text = "\nWelcome to virtual microbiology lab \nclick me to enter your ID:";
+                tb.fontSize = "33px";
+                sv.addControl(tb);
+            
+                var input = new BABYLON.GUI.InputText();
+                input.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+                input.top = "120px";
+                input.width = 0.4;
+                input.maxWidth = 0.4;
+                input.height = "40px";
+                //input.text = "click here, type, hit enter";
+                input.color = "gray";
+                input.background = "white";
+                input.fontSize = "32px";
+                input.isVisible = false;
+                advancedTexture1.addControl(input);    
+                input.onBlurObservable.add(function() {
+                    tb.text += " " + input.text;
+                    input.isVisible = false;
+                });
+                //Let input.text hides and input user's text
+                input.onFocusObservable.add(function() {
+                    input.text = "";
+                });
+                //Refresh input.text, user can keep to input text
+                sv.onPointerUpObservable.add(()=>{
+                    if (input.isVisible == true) {
+                        input.isVisible = false;
+                        return;
+                    }
+                    input.isVisible = true;
+                    input.text = "click here, type, hit enter";
+                });
+
             
             // this show the inspector, uncomment to use it
             //scene.debugLayer.show();

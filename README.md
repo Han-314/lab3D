@@ -20,7 +20,10 @@ It is a navigational prompt that disappears automatically when the object is sel
 When clicks on an item, it displays relevant infomations (details).
 
 ### Intersect
-When objects interact with each other, the corresponding reaction is displayed
+When objects interact with each other, the corresponding reaction is displayed.
+
+### Input
+User can enter their ID in the simulation.
 
 ### Highlighting
 When an object is selected, it will be highlighted.
@@ -31,5 +34,11 @@ When an object is selected, it will be highlighted.
 - [x] Dragging objects
 - [x] GUI
 - [x] Display
+- [x] Highlighting
+- [x] Input
 - [ ] Intersect
-- [ ] Highlighting
+
+## Announcement
+	- GUI has been deleted due to it is similar to Dispalys.
+	- Input is not yet able to transmit data to the back end.	
+
